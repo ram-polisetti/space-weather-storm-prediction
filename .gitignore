@@ -1,0 +1,11 @@
+# raw downloads (large; reproducible via src/download.py)
+data/raw/
+# processed parquet (reproducible via src/build_dataset.py)
+data/processed/
+*.parquet
+# trained model binaries (large; reproducible via src/train.py)
+results/*.joblib
+# python noise
+__pycache__/
+*.pyc
+.venv/

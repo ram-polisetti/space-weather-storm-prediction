@@ -1,0 +1,316 @@
+{
+  "dst_t1h": {
+    "best_model": "ridge_a10.0",
+    "val_rmse_best": 2.39,
+    "val": {
+      "n": 8688,
+      "persistence": {
+        "RMSE": 2.92,
+        "MAE": 2.07
+      },
+      "model": {
+        "RMSE": 2.39,
+        "MAE": 1.78
+      }
+    },
+    "test": {
+      "n": 8778,
+      "persistence": {
+        "RMSE": 2.83,
+        "MAE": 2.03
+      },
+      "model": {
+        "RMSE": 2.31,
+        "MAE": 1.73
+      }
+    },
+    "extra": {
+      "n": 34105,
+      "persistence": {
+        "RMSE": 4.58,
+        "MAE": 2.89
+      },
+      "model": {
+        "RMSE": 3.55,
+        "MAE": 2.35
+      }
+    },
+    "top_features": [
+      [
+        "dst_mean3h_mean12h",
+        16.2354
+      ],
+      [
+        "dst_mean12h_mean3h",
+        16.2354
+      ],
+      [
+        "dst_mean12h_mean12h",
+        11.7584
+      ],
+      [
+        "dst_mean24h_mean3h",
+        7.889
+      ],
+      [
+        "dst_mean12h_max3h",
+        4.8522
+      ],
+      [
+        "dst_lag6h_mean6h",
+        4.4916
+      ],
+      [
+        "dst_mean12h_min3h",
+        4.1765
+      ],
+      [
+        "V1800_mean3h",
+        3.8395
+      ],
+      [
+        "dst_min3h_mean3h",
+        3.3913
+      ],
+      [
+        "dst_mean12h",
+        2.9818
+      ],
+      [
+        "dst_min24h_mean3h",
+        2.8815
+      ],
+      [
+        "dst_lag6h",
+        2.7553
+      ],
+      [
+        "dst_mean6h_mean3h",
+        2.5705
+      ],
+      [
+        "dst_mean3h_mean6h",
+        2.5705
+      ],
+      [
+        "dst_min6h_mean3h",
+        2.4595
+      ]
+    ]
+  },
+  "dst_t6h": {
+    "best_model": "gbm_100it_lr0.05_leaf31",
+    "val_rmse_best": 6.31,
+    "val": {
+      "n": 8688,
+      "persistence": {
+        "RMSE": 7.8,
+        "MAE": 5.65
+      },
+      "model": {
+        "RMSE": 6.31,
+        "MAE": 4.66
+      }
+    },
+    "test": {
+      "n": 8778,
+      "persistence": {
+        "RMSE": 7.73,
+        "MAE": 5.61
+      },
+      "model": {
+        "RMSE": 6.41,
+        "MAE": 4.69
+      }
+    },
+    "extra": {
+      "n": 34105,
+      "persistence": {
+        "RMSE": 13.54,
+        "MAE": 8.26
+      },
+      "model": {
+        "RMSE": 12.14,
+        "MAE": 7.46
+      }
+    },
+    "top_features": [
+      [
+        "dst_min3h",
+        1.1617
+      ],
+      [
+        "dst_d1h",
+        0.0677
+      ],
+      [
+        "newell",
+        0.0629
+      ],
+      [
+        "dst_min3h_min3h",
+        0.0535
+      ],
+      [
+        "T1800_max3h",
+        0.0326
+      ],
+      [
+        "dst_lag1h_max12h",
+        0.0267
+      ],
+      [
+        "Pressure1800_max12h",
+        0.0245
+      ],
+      [
+        "dst_min12h_min12h",
+        0.0214
+      ],
+      [
+        "dst_mean24h",
+        0.0193
+      ],
+      [
+        "Pressure1800_min12h",
+        0.0188
+      ],
+      [
+        "T1800",
+        0.0172
+      ],
+      [
+        "dst_d6h_max6h",
+        0.0161
+      ],
+      [
+        "newell_max3h",
+        0.0153
+      ],
+      [
+        "T1800_mean12h",
+        0.0123
+      ],
+      [
+        "V1800_min12h",
+        0.012
+      ]
+    ]
+  },
+  "storm50_6h": {
+    "val_cut0.5": {
+      "n_pos_hours": 78,
+      "POD": 0.564,
+      "FAR": 0.405,
+      "CSI": 0.407,
+      "TP": 44,
+      "FP": 30,
+      "FN": 34
+    },
+    "test_cut0.5": {
+      "n_pos_hours": 55,
+      "POD": 0.455,
+      "FAR": 0.444,
+      "CSI": 0.333,
+      "TP": 25,
+      "FP": 20,
+      "FN": 30
+    },
+    "test_operating_points": {
+      "0.3": {
+        "n_pos_hours": 55,
+        "POD": 0.491,
+        "FAR": 0.491,
+        "CSI": 0.333,
+        "TP": 27,
+        "FP": 26,
+        "FN": 28
+      },
+      "0.5": {
+        "n_pos_hours": 55,
+        "POD": 0.455,
+        "FAR": 0.444,
+        "CSI": 0.333,
+        "TP": 25,
+        "FP": 20,
+        "FN": 30
+      },
+      "0.7": {
+        "n_pos_hours": 55,
+        "POD": 0.418,
+        "FAR": 0.303,
+        "CSI": 0.354,
+        "TP": 23,
+        "FP": 10,
+        "FN": 32
+      }
+    },
+    "extra_cut0.5": {
+      "n_pos_hours": 1777,
+      "POD": 0.755,
+      "FAR": 0.249,
+      "CSI": 0.604,
+      "TP": 1341,
+      "FP": 445,
+      "FN": 436
+    }
+  },
+  "storm100_6h": {
+    "val_cut0.5": {
+      "n_pos_hours": 0,
+      "POD": null,
+      "FAR": null,
+      "CSI": null,
+      "TP": 0,
+      "FP": 0,
+      "FN": 0
+    },
+    "test_cut0.5": {
+      "n_pos_hours": 0,
+      "POD": null,
+      "FAR": null,
+      "CSI": null,
+      "TP": 0,
+      "FP": 0,
+      "FN": 0
+    },
+    "test_operating_points": {
+      "0.3": {
+        "n_pos_hours": 0,
+        "POD": null,
+        "FAR": null,
+        "CSI": null,
+        "TP": 0,
+        "FP": 0,
+        "FN": 0
+      },
+      "0.5": {
+        "n_pos_hours": 0,
+        "POD": null,
+        "FAR": null,
+        "CSI": null,
+        "TP": 0,
+        "FP": 0,
+        "FN": 0
+      },
+      "0.7": {
+        "n_pos_hours": 0,
+        "POD": null,
+        "FAR": null,
+        "CSI": null,
+        "TP": 0,
+        "FP": 0,
+        "FN": 0
+      }
+    },
+    "extra_cut0.5": {
+      "n_pos_hours": 291,
+      "POD": 0.285,
+      "FAR": 0.629,
+      "CSI": 0.192,
+      "TP": 83,
+      "FP": 141,
+      "FN": 208
+    }
+  }
+}

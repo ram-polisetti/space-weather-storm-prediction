@@ -1,0 +1,22 @@
+{
+  "n": 92918,
+  "resid_mean": 0.646,
+  "resid_std": 9.559,
+  "resid_p1": -24.76,
+  "resid_p99": 23.49,
+  "2015-03-17_st-patricks": {
+    "min_dst_obs": -234.0,
+    "min_pred_t6h": -197.6,
+    "max_storm_proba": 1.0
+  },
+  "2017-09-08_sep2017": {
+    "min_dst_obs": -148.0,
+    "min_pred_t6h": -116.6,
+    "max_storm_proba": 1.0
+  },
+  "2024-05-11_gannon": {
+    "min_dst_obs": -406.0,
+    "min_pred_t6h": -177.9,
+    "max_storm_proba": 1.0
+  }
+}
