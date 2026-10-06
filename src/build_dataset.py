@@ -1,12 +1,13 @@
 """Parse raw OMNI2 + Kyoto Dst downloads into a modeling-ready hourly dataset.
 
-- OMNI2 HAPI CSVs: fill values (>=9000 sentinel) -> NaN.
+- OMNI2 HAPI CSVs: per-parameter metadata fill values -> NaN.
 - Kyoto Dst monthly ASCII: DST<YY><MM>*<DD> rows -> hourly series.
 - Merge on UTC hour; engineer lag-window features + coupling functions.
 - Targets: Dst at +1h and +6h (Kyoto series, authoritative).
 - Output: data/processed/dataset.parquet + data/processed/feature_dictionary.csv
 """
 import glob
+import json
 import os
 import re
 
@@ -17,9 +18,6 @@ BASE = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
 RAW = os.path.join(BASE, "data", "raw")
 PROC = os.path.join(BASE, "data", "processed")
 
-FILL_SENTINEL = 9000.0  # OMNI2 hourly fill values are 9999.x variants
-
-
 def load_omni():
     frames = []
     for path in sorted(glob.glob(os.path.join(RAW, "omni2_h0_*.csv"))):
@@ -28,27 +26,16 @@ def load_omni():
         # HAPI csv with include=header: comment lines start with '#'; the header
         # block documents each parameter's fill value, e.g. #"fill": "999.9"
         header_idx = next(i for i, l in enumerate(lines) if not l.startswith("#"))
-        fills = {}
-        for l in lines[:header_idx]:
-            m = re.search(r'"name":\s*"([^"]+)"', l)
-            mf = re.search(r'"fill":\s*"([^"]+)"', l)
-            # name and fill appear on adjacent comment lines; pair by order
-            if m:
-                pending = m.group(1)
-            if mf and pending:
-                try:
-                    fills[pending] = float(mf.group(1))
-                except ValueError:
-                    pass
-                pending = None
-        df = pd.read_csv(path, skiprows=header_idx, header=None,
-                         names=["Time", "ABS_B1800", "BY_GSM1800", "BZ_GSM1800",
-                                "T1800", "N1800", "V1800", "Pressure1800",
-                                "E1800", "Beta1800", "KP1800", "DST1800"])
-        for col, fill in fills.items():
-            if col in df.columns and col != "Time":
+        metadata = json.loads("".join(line[1:] for line in lines[:header_idx]))
+        parameters = metadata["parameters"]
+        names = [parameter["name"] for parameter in parameters]
+        df = pd.read_csv(path, skiprows=header_idx, header=None, names=names)
+        for parameter in parameters:
+            col, fill = parameter["name"], parameter.get("fill")
+            if col != "Time":
                 df[col] = pd.to_numeric(df[col], errors="coerce")
-                df[col] = df[col].mask(df[col] >= fill * 0.999)
+                if fill is not None:
+                    df[col] = df[col].mask(df[col] == float(fill))
         frames.append(df)
     omni = pd.concat(frames, ignore_index=True)
     omni["Time"] = pd.to_datetime(omni["Time"], utc=True).dt.floor("h")  # half-hour midpoint -> hour
@@ -87,6 +74,14 @@ def load_kyoto_dst():
 
 def add_features(df):
     df = df.copy()
+    df["Time"] = pd.to_datetime(df["Time"], utc=True)
+    if df["Time"].isna().any() or df["Time"].duplicated().any():
+        raise ValueError("Time must contain unique, non-missing UTC hours")
+    if not df["Time"].eq(df["Time"].dt.floor("h")).all():
+        raise ValueError("Time must be aligned to UTC hours")
+    # Row shifts represent hours only on a complete hourly grid. Preserve gaps
+    # as NaN; never invent observations or interpolate future targets.
+    df = df.set_index("Time").sort_index().asfreq("h").reset_index()
     bz = df["BZ_GSM1800"]
     # Southward Bz magnitude (driver of storms)
     df["bz_south"] = (-bz).clip(lower=0)
@@ -117,15 +112,16 @@ def add_features(df):
                  "dst_mean3h", "dst_min3h", "dst_mean6h", "dst_min6h",
                  "dst_mean12h", "dst_min12h", "dst_mean24h", "dst_min24h"]
     feat_base = [c for c in feat_base if c in df.columns]
+    windows = [df]
     for w in (3, 6, 12):
         roll = df[feat_base].rolling(window=w, min_periods=max(1, w // 2))
-        df[[f"{c}_mean{w}h" for c in feat_base]] = roll.mean().values
-        df[[f"{c}_min{w}h" for c in feat_base]] = roll.min().values
-        df[[f"{c}_max{w}h" for c in feat_base]] = roll.max().values
+        for suffix, values in (("mean", roll.mean()), ("min", roll.min()), ("max", roll.max())):
+            windows.append(values.rename(columns={c: f"{c}_{suffix}{w}h" for c in feat_base}))
+    df = pd.concat(windows, axis=1)
     # Targets: Kyoto Dst at +1h / +6h, and storm-min over next 6h (t+1..t+6)
     df["dst_t1h"] = df["dst_kyoto"].shift(-1)
     df["dst_t6h"] = df["dst_kyoto"].shift(-6)
-    df["dst_nextmin6h"] = df["dst_kyoto"].shift(-6).rolling(6, min_periods=6).min().values
+    df["dst_nextmin6h"] = df["dst_kyoto"].shift(-1).iloc[::-1].rolling(6, min_periods=6).min().iloc[::-1].values
     return df
 
 
