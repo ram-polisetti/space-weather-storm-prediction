@@ -9,3 +9,6 @@ results/*.joblib
 __pycache__/
 *.pyc
 .venv/
+
+.venv312/
+.pytest_cache/
