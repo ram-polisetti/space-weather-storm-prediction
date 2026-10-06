@@ -6,8 +6,9 @@ telemetry with 1–6 hour lead time — an open-science ML pipeline.
 ## Why
 Grid and satellite operators use Dst/Kp forecasts to take protective action
 (transformer load management, satellite safe-moding). This project builds a
-reproducible pipeline that beats persistence on real storm events, using only
-open NASA data.
+reproducible hindcast pipeline evaluated against persistence on real storm
+events, using open NASA and Kyoto data. Historical performance is recorded
+in RESULTS.md and needs recomputation after pipeline repairs.
 
 ## Data provenance
 | Dataset | Source | Access |
@@ -32,6 +33,19 @@ python src/build_dataset.py # parse, align, engineer features -> data/processed/
 python src/train.py         # baselines + gradient boosting, time-based split
 python src/evaluate.py      # metrics + storm case plots -> results/
 ```
+
+## Integrity checks
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest -q
+```
+
+The offline tests use downloaded NASA OMNI and Kyoto records from the May
+2024 storm, with exact source URLs and SHA-256 hashes in
+[`tests/fixtures/README.md`](tests/fixtures/README.md). Missing hours stay
+missing; no synthetic values or interpolation are used. Forecast labels must
+remain inside their time split, and unknown labels are not non-storm examples.
 
 ## Results
 See [`RESULTS.md`](RESULTS.md) — regression + storm-event metrics with honest
