@@ -12,3 +12,6 @@ __pycache__/
 
 .venv312/
 .pytest_cache/
+
+# Local resumable model grid: publish JSON provenance, not model binaries.
+results/rerun-checkpoints/
