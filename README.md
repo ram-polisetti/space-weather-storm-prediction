@@ -7,8 +7,8 @@ telemetry with 1–6 hour lead time — an open-science ML pipeline.
 Grid and satellite operators use Dst/Kp forecasts to take protective action
 (transformer load management, satellite safe-moding). This project builds a
 reproducible hindcast pipeline evaluated against persistence on real storm
-events, using open NASA and Kyoto data. Historical performance is recorded
-in RESULTS.md and needs recomputation after pipeline repairs.
+events, using open NASA and Kyoto data. Fresh post-repair hindcast results are recorded in RESULTS.md. This is not
+a real-time forecast or an operational warning system.
 
 ## Data provenance
 | Dataset | Source | Access |
@@ -58,3 +58,7 @@ aviation, finance/insurance, GNSS, climate methods, epidemiology, education.
 
 ## License
 MIT — see `LICENSE`.
+
+Fresh-rerun plot delivery: the full checked archive is delivered separately.
+This text-only review branch retains old PNGs, which are NOT fresh rerun
+outputs. See RESULTS.md before interpreting repository plot files.
