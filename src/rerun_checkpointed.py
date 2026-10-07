@@ -12,17 +12,20 @@ import joblib
 import numpy as np
 import pandas as pd
 import train
+from rerun_integrity import configuration, fingerprint, validate, save_checkpoint, IntegrityError
 from sklearn.ensemble import HistGradientBoostingRegressor, HistGradientBoostingClassifier
 from sklearn.linear_model import Ridge
 
 base = Path(train.BASE)
-checkpoint = base / 'results' / 'rerun-checkpoints'
-checkpoint.mkdir(exist_ok=True)
+digest, fingerprint_details = fingerprint(base, configuration(train))
+checkpoint = base / 'results' / 'rerun-checkpoints' / digest
+checkpoint.mkdir(parents=True, exist_ok=True)
 data_path = base / 'data' / 'processed' / 'dataset.parquet'
 source_hash = hashlib.sha256(data_path.read_bytes()).hexdigest()
 df = pd.read_parquet(data_path)
 feat = [c for c in df.columns if c not in ('Time','dst_kyoto','dst_t1h','dst_t6h','dst_min6h','dst_nextmin6h','DST1800','KP1800','cov_core')]
-assert not any('nextmin' in c for c in feat)
+if any('nextmin' in c for c in feat):
+ raise IntegrityError('future label included in features')
 df = df.dropna(subset=feat).reset_index(drop=True)
 parts = train.split_dataset(df, {'train':('2015-01-01','2019-01-01'),'val':('2019-01-01','2020-01-01'),'test':('2020-01-01','2021-01-01'),'extra':('2021-01-01','2025-01-01')})
 Xtr=parts['train'][feat].values;Xva=parts['val'][feat].values
@@ -36,12 +39,13 @@ for target in train.REG_TARGETS:
 for target,name,model in jobs:
  record=checkpoint/f'{target}-{name}.json'
  if record.exists():
-  assert json.loads(record.read_text())['dataset_sha256']==source_hash
+  validate(json.loads(record.read_text()), digest, target, name, checkpoint/f'{target}-{name}.joblib')
   continue
  model.fit(Xtr,parts['train'][target].values)
  score=train.rmse(parts['val'][target].values,model.predict(Xva))
- joblib.dump(model,checkpoint/f'{target}-{name}.joblib')
- record.write_text(json.dumps({'target':target,'name':name,'val_rmse':score,'dataset_sha256':source_hash})+'\n')
+ save_checkpoint(record, checkpoint/f'{target}-{name}.joblib', model,
+                 {'target':target,'name':name,'val_rmse':score,'dataset_sha256':source_hash,
+                  'fingerprint':digest}, joblib.dump)
  print(json.dumps({'completed':name,'target':target,'val_rmse':score}),flush=True)
  break
 else:
