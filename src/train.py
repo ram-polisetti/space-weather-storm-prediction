@@ -76,6 +76,17 @@ def tune_regressor(Xtr, ytr, Xva, yva):
     return best
 
 
+def split_dataset(df, splits, horizon_hours=6):
+    """Exclude forecast labels that cross a split boundary or are unknown."""
+    known = df.dropna(subset=REG_TARGETS + ["dst_nextmin6h", "dst_kyoto"])
+    parts = {}
+    for name, (start, end) in splits.items():
+        start, end = pd.Timestamp(start, tz="UTC"), pd.Timestamp(end, tz="UTC")
+        mask = (known.Time >= start) & (known.Time + pd.Timedelta(hours=horizon_hours) < end)
+        parts[name] = known.loc[mask].reset_index(drop=True)
+    return parts
+
+
 def main():
     os.makedirs(RES, exist_ok=True)
     df = pd.read_parquet(os.path.join(PROC, "dataset.parquet"))
@@ -95,8 +106,7 @@ def main():
         "test": ("2020-01-01", "2021-01-01"),
         "extra": ("2021-01-01", "2025-01-01"),
     }
-    parts = {k: df[(df.Time >= s) & (df.Time < e)].reset_index(drop=True)
-             for k, (s, e) in splits.items()}
+    parts = split_dataset(df, splits)
     for k, p in parts.items():
         print(f"  {k}: {len(p)} rows")
 

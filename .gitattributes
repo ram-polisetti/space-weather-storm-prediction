@@ -1,0 +1,2 @@
+tests/fixtures/*.csv -text
+tests/fixtures/*.txt -text

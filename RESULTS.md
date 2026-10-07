@@ -5,6 +5,17 @@ and Kyoto WDC Dst (final 2015–2020, provisional 2021–Sep 2025). 94,223 hourl
 rows, 2015-01-01 to 2025-09-29. 2,933 storm hours (Dst <= -50 nT), 366 intense
 hours (Dst <= -100 nT). Deepest minimum: -406 nT on 2024-05-11 (Gannon superstorm).
 
+## Reproduction status
+
+The numbers below are historical results from the original run, not results
+from the time-integrity repair. They must be recomputed before comparison:
+the repaired pipeline restores missing UTC hours, requires all future labels
+to be known, and purges six forecast hours at each split boundary. The 2015
+and 2017 case plots are training-period illustrations, not held-out forecasts.
+The residual summary and histogram include training years and must not be
+read as held-out test error. OMNI and final/provisional Dst are retrospective
+products, so this is a hindcast, not proof of real-time operational skill.
+
 ## Method
 
 **Targets.** Kyoto Dst at +1h and +6h (regression); storm events defined as
