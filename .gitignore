@@ -15,3 +15,8 @@ __pycache__/
 
 # Local resumable model grid: publish JSON provenance, not model binaries.
 results/rerun-checkpoints/
+
+# Immutable local model generations and atomic current pointer.
+results/generations/
+results/finalized
+results/.finalized-*
