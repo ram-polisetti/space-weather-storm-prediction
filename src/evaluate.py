@@ -6,11 +6,13 @@ to results/. Case studies: 2015-03-17 (St Patrick's), 2017-09-08 (Sep 2017),
 """
 import json
 import os
+from pathlib import Path
 
 import joblib
 import matplotlib
 import numpy as np
 import pandas as pd
+from rerun_integrity import completed_results
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -27,6 +29,10 @@ CASES = {
 
 
 def main():
+    resolved = completed_results(RES)
+    if resolved != Path(RES):
+        print('Completed generation already contains plots:', resolved)
+        return
     os.makedirs(RES, exist_ok=True)
     df = pd.read_parquet(os.path.join(PROC, "dataset.parquet"))
     feats = joblib.load(os.path.join(RES, "feature_cols.joblib"))
