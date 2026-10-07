@@ -1,117 +1,74 @@
-# RESULTS — space-weather storm prediction
+# Fresh historical hindcast: October 7, 2026
 
-Two independent open data sources: NASA OMNI2 solar-wind/IMF (via CDAWeb HAPI)
-and Kyoto WDC Dst (final 2015–2020, provisional 2021–Sep 2025). 94,223 hourly
-rows, 2015-01-01 to 2025-09-29. 2,933 storm hours (Dst <= -50 nT), 366 intense
-hours (Dst <= -100 nT). Deepest minimum: -406 nT on 2024-05-11 (Gannon superstorm).
+This replaces the pre-repair performance record. NASA OMNI2 and Kyoto Dst were downloaded again (140 HTTP-200 files), then the repaired dataset, full original grid, classifiers and evaluation were rerun. This is a retrospective hindcast, not a live 2026 storm forecast or an operational alert system.
 
-## Reproduction status
+Dataset: 94,223 rows, 269 columns, from 2015-01-01 00:00:00+00:00 through 2025-09-30 22:00:00+00:00. Observed Dst <= -50: 2,933 hours; <= -100: 366.
 
-The numbers below are historical results from the original run, not results
-from the time-integrity repair. They must be recomputed before comparison:
-the repaired pipeline restores missing UTC hours, requires all future labels
-to be known, and purges six forecast hours at each split boundary. The 2015
-and 2017 case plots are training-period illustrations, not held-out forecasts.
-The residual summary and histogram include training years and must not be
-read as held-out test error. OMNI and final/provisional Dst are retrospective
-products, so this is a hindcast, not proof of real-time operational skill.
+## Method and splits
 
-## Method
+260 features, with future Dst labels and OMNI Dst/Kp excluded. Missing UTC hours are restored and unknown future labels are excluded. Six forecast hours are purged at each split boundary. Training: 2015-2018 (34,888 rows); validation: 2019 (8,682); test: 2020 (8,772); provisional-data extra split: 2021-2024 (34,099), ending before January 1, 2025. Downloaded 2025 rows are not included in the scored extra split.
 
-**Targets.** Kyoto Dst at +1h and +6h (regression); storm events defined as
-min Dst over the next 6h <= -50 / -100 nT (classification).
+All 44 original regression candidates were fit: 4 Ridge and 18 histogram-gradient-boosting candidates per horizon. Validation RMSE picks the winner in original candidate order; ties keep the first. Two original balanced classifiers were fit separately. No grid reduction, synthetic data or altered random seed. Checkpointing changes execution granularity, not the method.
 
-**Features (260).** OMNI2 IMF/plasma (B, By/Bz GSM, V, N, T, pressure, E, beta),
-southward-Bz magnitude, Newell coupling function, plus Dst history: lags at
-1/3/6/12/24h, hourly changes, rolling means/mins over 3/6/12/24h — each with
-3/6/12h rolling mean/min/max windows.
+## Regression
 
-**Splits (strictly by time, no shuffling).** Train 2015–2018, validation 2019,
-test 2020 (final Dst), extra 2021–2025 (provisional Dst, includes the May 2024
-superstorm — an out-of-distribution stress test).
+RMSE and MAE are in nT. Persistence carries the current observed Dst forward.
 
-**Models.** Persistence (current Dst carried forward), Ridge, and
-HistGradientBoosting (regression + balanced classifiers). Hyperparameters
-chosen on the validation split by grid search.
+### +1h: ridge_a10.0
 
-## Results (final, after iteration 2)
+| Split | Rows | Persistence RMSE | Model RMSE | Persistence MAE | Model MAE |
+|---|---:|---:|---:|---:|---:|
+| val | 8682 | 2.92 | 2.39 | 2.07 | 1.78 |
+| test | 8772 | 2.83 | 2.31 | 2.03 | 1.73 |
+| extra | 34099 | 4.58 | 3.55 | 2.88 | 2.34 |
 
-RMSE/MAE in nT. Model hyperparameters were selected on the 2019 validation
-split; test = 2020 final Dst; extra = 2021–2025 provisional Dst.
+### +6h: gbm_100it_lr0.05_leaf63
 
-### Dst at +1h (best: Ridge, alpha=10)
+| Split | Rows | Persistence RMSE | Model RMSE | Persistence MAE | Model MAE |
+|---|---:|---:|---:|---:|---:|
+| val | 8682 | 7.8 | 6.28 | 5.65 | 4.63 |
+| test | 8772 | 7.73 | 6.44 | 5.62 | 4.7 |
+| extra | 34099 | 13.54 | 12.22 | 8.26 | 7.47 |
 
-| split | n | persistence RMSE | model RMSE | persistence MAE | model MAE |
-|---|---|---|---|---|---|
-| val 2019 | 8,688 | 2.92 | 2.39 | 2.07 | 1.78 |
-| test 2020 | 8,778 | 2.83 | 2.31 | 2.03 | 1.73 |
-| extra 2021–25 | 34,105 | 4.58 | 3.55 | 2.89 | 2.35 |
+## Storm-hour classification
 
-### Dst at +6h (best: HistGradientBoosting, 100 iters, lr 0.05, 31 leaves)
+Threshold: probability >= 0.5. These are hour-level counts, not independent storm-event trials. POD is detection probability; FAR is the false-alarm ratio; CSI is critical success index.
 
-| split | n | persistence RMSE | model RMSE | persistence MAE | model MAE |
-|---|---|---|---|---|---|
-| val 2019 | 8,688 | 7.80 | 6.31 | 5.65 | 4.66 |
-| test 2020 | 8,778 | 7.73 | 6.41 | 5.61 | 4.69 |
-| extra 2021–25 | 34,105 | 13.54 | 12.14 | 8.26 | 7.46 |
+| Future minimum | Split | Positive hours | TP | FP | FN | POD | FAR | CSI |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| storm50_6h | val | 78 | 47 | 37 | 31 | 0.603 | 0.44 | 0.409 |
+| storm50_6h | test | 55 | 28 | 23 | 27 | 0.509 | 0.451 | 0.359 |
+| storm50_6h | extra | 1777 | 1379 | 471 | 398 | 0.776 | 0.255 | 0.613 |
+| storm100_6h | val | 0 | 0 | 0 | 0 | not defined | not defined | not defined |
+| storm100_6h | test | 0 | 0 | 0 | 0 | not defined | not defined | not defined |
+| storm100_6h | extra | 291 | 132 | 101 | 159 | 0.454 | 0.433 | 0.337 |
 
-Top +6h features (permutation importance): recent Dst minimum (`dst_min3h`),
-hourly Dst change (`dst_d1h`), Newell solar-wind coupling, recent solar-wind
-temperature and pressure maxima. Physically sensible: storm onset is driven by
-the solar wind, but the current Dst level and its slope carry most of the
-6-hour predictability.
+No intense-storm positive hours occur in validation/test, so their intense-storm detection skill cannot be estimated there. The extra split has 291 positive hours, but uses provisional Dst. Probability scores are not claimed calibrated.
 
-### Storm-event classification (min Dst over next 6h)
+## Case plots and limits
 
-| task | split | storm hours | POD | FAR | CSI |
-|---|---|---|---|---|---|
-| <= -50 nT | val | 78 | 0.56 | 0.41 | 0.41 |
-| <= -50 nT | test | 55 | 0.46 | 0.44 | 0.33 |
-| <= -50 nT | extra | 1,777 | 0.76 | 0.25 | 0.60 |
-| <= -100 nT | extra | 291 | 0.29 | 0.63 | 0.19 |
-| <= -100 nT | val/test | 0 | — | — | — (no intense-storm hours in 2019–2020) |
+2015/2017 plots are training-period illustrations, not held-out results. May 2024 is in the extra split. The residual histogram includes training years and is not a held-out performance distribution. All four regenerated PNGs were visually inspected for readable axes/legends and clipping.
 
-The event classifier is strongest exactly where it matters: during the
-storm-rich 2021–2025 period (POD 0.76, FAR 0.25 for moderate storms).
-Intense storms (<= -100 nT) remain hard: only 212 such hours in the entire
-training set, and the May 2024 superstorm is far outside the training
-distribution.
+| Case | Observed minimum | Predicted +6h minimum | Maximum storm score |
+|---|---:|---:|---:|
+| 2015-03-17_st-patricks | -234.0 | -198.6 | 1.0 |
+| 2017-09-08_sep2017 | -148.0 | -116.0 | 1.0 |
+| 2024-05-11_gannon | -406.0 | -181.3 | 1.0 |
 
-### Case studies (see `results/case_*.png`)
+The May 2024 point forecast misses much of the superstorm depth (-181.3 predicted minimum vs -406 observed). The maxima are not paired onset-time errors. Low average error and a high storm score do not establish safe grid/satellite decisions. OMNI and Kyoto are retrospective products, provisional targets may change, hours are correlated, intense storms are rare, and no real-time latency or uncertainty/calibration evaluation was done. The prior six integrity tests pass; they do not establish production readiness.
 
-| storm | observed min Dst | model min Dst@+6h | max P(storm in 6h) |
-|---|---|---|---|
-| 2015-03-17 St. Patrick's | -234 | -198 | 1.00 |
-| 2017-09-08 | -148 | -117 | 1.00 |
-| 2024-05-11 Gannon | -406 | -178 | 1.00 |
+## Reproduce and provenance
 
-The detector fires with probability 1.0 on all three storms, including
-Gannon — but the point forecast underpredicts Gannon's depth by ~230 nT.
-The model has never seen a -400 nT storm; this is the honest limit of
-training on 2015–2018.
+Use the normal download/build/train/evaluate commands in README. If a foreground execution limit interrupts the grid, run `python src/rerun_checkpointed.py` until it reports all candidates complete, then `python src/finalize_rerun.py` and `python src/evaluate.py`. Checkpoints must match the dataset SHA; finalization uses original scoring, permutation importance and classifiers. Checkpoint model binaries and processed data remain excluded from git. `results/fresh-fetch-manifest.tsv` isolates this download from historical manifest rows. `results/fresh-rerun-provenance.json` records environment, source/output hashes and candidate scores. No model installation/deployment, production alert or new external recipient was configured.
 
-## Limitations
+## Plot delivery caveat for this branch
 
-1. Provisional Dst (2021–2025) will be revised by Kyoto; the "extra" split
-   numbers may shift slightly when final data lands.
-2. OMNI2 has data gaps (spacecraft coverage); rows with <50% core-driver
-   coverage are dropped (~1.3% of hours).
-3. Intense-storm recall is weak (POD 0.29 at <= -100 nT) — rare-event problem,
-   needs more storm examples or physics-informed augmentation.
-4. +6h point forecasts underpredict unprecedented superstorm depths.
-5. No CME-imagery inputs; a model with coronagraph data would see storms
-   coming 1–3 days out instead of hours.
+The four fresh PNGs are in the separately delivered checked review archive. Binary web uploads are blocked at commit, so this text-only review branch leaves old repository PNGs in place. Those old PNGs are NOT the fresh outputs described above. Do not cite them as evidence for this rerun.
 
-## Iteration log
+Byte-provenance note: source/output hashes in fresh-rerun-provenance.json identify the checked local rerun artifacts. GitHub's editor reformatted only terminal whitespace in metrics.json and eval_summary.json; both parse identically to the originals. Their repository byte hashes therefore differ. Use the separately delivered archive for exact original output bytes and plot hashes.
 
-- **Build 1:** solar-wind features only. +6h RMSE barely beat persistence
-  (8.0 vs 8.08 nT) — Dst history was the missing signal.
-- **Iteration 1:** added Dst lags/changes/rolling stats; fixed a Newell
-  coupling NaN bug (`sin^(8/3)` of negative values). +6h test RMSE ~3.8
-  (with an undetected target-leakage feature — see Iteration 2).
-- **Iteration 2 (rework pass):** leakage audit caught `dst_nextmin6h`
-  (built from future Dst) in the feature set — removed, with an assertion
-  guard; honest +6h test RMSE is 6.41. Replaced the flawed event skill
-  (thresholded point forecast vs the *past*-6h minimum) with dedicated
-  storm-event classifiers. Added validation grid search; best +1h model is
-  Ridge (alpha=10), best +6h is a small GBM (100 iters, lr 0.05, 31 leaves).
+## Follow-up execution hardening
+
+The recorded numerical run above used the original checkpoint scripts. This follow-up does not refit models or change those results. Future runs use fingerprint-specific checkpoint directories covering dataset, training/build/evaluation source, explicit configuration, Python and dependency versions. Old dataset-only checkpoints are deliberately not accepted or relabeled as newly verified runs. Validation raises explicit errors even under `python -O`; checkpoint JSON is published only after a complete hashed model file.
+
+Finalization now builds models, metrics and case plots in an unpublished directory, validates the expected output set, then swaps one local POSIX symlink to an immutable completed generation. Consumers resolve `results/finalized` once. A failure leaves the last completed generation unchanged; no partial candidate is advertised as complete. This protects readers from interrupted processes, not disk loss or network-filesystem semantics. Do not mix root-level historical artifacts with the generation. A separate `evaluate.py` invocation validates an existing completed generation without rewriting it; finalization itself already creates its plots. Seven new offline tests cover fingerprint changes, corrupted/incomplete records, optimized Python, failed checkpoint writes, interrupted publication and reader snapshots/tampering. The complete local suite passes 13 tests. No claim is made that the full grid was rerun with this new hardening code.

@@ -3,7 +3,7 @@
     "best_model": "ridge_a10.0",
     "val_rmse_best": 2.39,
     "val": {
-      "n": 8688,
+      "n": 8682,
       "persistence": {
         "RMSE": 2.92,
         "MAE": 2.07
@@ -14,7 +14,7 @@
       }
     },
     "test": {
-      "n": 8778,
+      "n": 8772,
       "persistence": {
         "RMSE": 2.83,
         "MAE": 2.03
@@ -25,234 +25,234 @@
       }
     },
     "extra": {
-      "n": 34105,
+      "n": 34099,
       "persistence": {
         "RMSE": 4.58,
-        "MAE": 2.89
+        "MAE": 2.88
       },
       "model": {
         "RMSE": 3.55,
-        "MAE": 2.35
+        "MAE": 2.34
       }
     },
     "top_features": [
       [
-        "dst_mean3h_mean12h",
-        16.2354
+        "dst_mean12h_mean3h",
+        15.6519
       ],
       [
-        "dst_mean12h_mean3h",
-        16.2354
+        "dst_mean3h_mean12h",
+        15.6519
       ],
       [
         "dst_mean12h_mean12h",
-        11.7584
+        11.4609
       ],
       [
         "dst_mean24h_mean3h",
-        7.889
+        7.6734
       ],
       [
         "dst_mean12h_max3h",
-        4.8522
+        4.5403
       ],
       [
         "dst_lag6h_mean6h",
-        4.4916
+        4.2074
       ],
       [
         "dst_mean12h_min3h",
-        4.1765
+        3.9004
       ],
       [
         "V1800_mean3h",
-        3.8395
+        3.7747
       ],
       [
         "dst_min3h_mean3h",
-        3.3913
+        3.1737
       ],
       [
         "dst_mean12h",
-        2.9818
+        2.782
       ],
       [
         "dst_min24h_mean3h",
-        2.8815
+        2.7053
       ],
       [
         "dst_lag6h",
-        2.7553
+        2.5597
       ],
       [
         "dst_mean6h_mean3h",
-        2.5705
+        2.3819
       ],
       [
         "dst_mean3h_mean6h",
-        2.5705
+        2.3819
       ],
       [
-        "dst_min6h_mean3h",
-        2.4595
+        "dst_lag3h_mean12h",
+        2.2919
       ]
     ]
   },
   "dst_t6h": {
-    "best_model": "gbm_100it_lr0.05_leaf31",
-    "val_rmse_best": 6.31,
+    "best_model": "gbm_100it_lr0.05_leaf63",
+    "val_rmse_best": 6.28,
     "val": {
-      "n": 8688,
+      "n": 8682,
       "persistence": {
         "RMSE": 7.8,
         "MAE": 5.65
       },
       "model": {
-        "RMSE": 6.31,
-        "MAE": 4.66
+        "RMSE": 6.28,
+        "MAE": 4.63
       }
     },
     "test": {
-      "n": 8778,
+      "n": 8772,
       "persistence": {
         "RMSE": 7.73,
-        "MAE": 5.61
+        "MAE": 5.62
       },
       "model": {
-        "RMSE": 6.41,
-        "MAE": 4.69
+        "RMSE": 6.44,
+        "MAE": 4.7
       }
     },
     "extra": {
-      "n": 34105,
+      "n": 34099,
       "persistence": {
         "RMSE": 13.54,
         "MAE": 8.26
       },
       "model": {
-        "RMSE": 12.14,
-        "MAE": 7.46
+        "RMSE": 12.22,
+        "MAE": 7.47
       }
     },
     "top_features": [
       [
         "dst_min3h",
-        1.1617
-      ],
-      [
-        "dst_d1h",
-        0.0677
-      ],
-      [
-        "newell",
-        0.0629
+        0.8496
       ],
       [
         "dst_min3h_min3h",
-        0.0535
+        0.1059
       ],
       [
-        "T1800_max3h",
-        0.0326
+        "newell",
+        0.0923
       ],
       [
-        "dst_lag1h_max12h",
-        0.0267
+        "dst_d1h",
+        0.0603
       ],
       [
         "Pressure1800_max12h",
-        0.0245
-      ],
-      [
-        "dst_min12h_min12h",
-        0.0214
-      ],
-      [
-        "dst_mean24h",
-        0.0193
-      ],
-      [
-        "Pressure1800_min12h",
-        0.0188
-      ],
-      [
-        "T1800",
-        0.0172
-      ],
-      [
-        "dst_d6h_max6h",
-        0.0161
+        0.0381
       ],
       [
         "newell_max3h",
-        0.0153
+        0.0288
       ],
       [
-        "T1800_mean12h",
-        0.0123
+        "T1800",
+        0.0266
+      ],
+      [
+        "dst_min12h_min12h",
+        0.0263
+      ],
+      [
+        "Pressure1800_max6h",
+        0.0249
+      ],
+      [
+        "E1800",
+        0.0241
+      ],
+      [
+        "Beta1800_mean12h",
+        0.0176
+      ],
+      [
+        "newell_max12h",
+        0.0176
+      ],
+      [
+        "dst_min12h_min6h",
+        0.0144
+      ],
+      [
+        "Pressure1800",
+        0.0142
       ],
       [
         "V1800_min12h",
-        0.012
+        0.0141
       ]
     ]
   },
   "storm50_6h": {
     "val_cut0.5": {
       "n_pos_hours": 78,
-      "POD": 0.564,
-      "FAR": 0.405,
-      "CSI": 0.407,
-      "TP": 44,
-      "FP": 30,
-      "FN": 34
+      "POD": 0.603,
+      "FAR": 0.44,
+      "CSI": 0.409,
+      "TP": 47,
+      "FP": 37,
+      "FN": 31
     },
     "test_cut0.5": {
       "n_pos_hours": 55,
-      "POD": 0.455,
-      "FAR": 0.444,
-      "CSI": 0.333,
-      "TP": 25,
-      "FP": 20,
-      "FN": 30
+      "POD": 0.509,
+      "FAR": 0.451,
+      "CSI": 0.359,
+      "TP": 28,
+      "FP": 23,
+      "FN": 27
     },
     "test_operating_points": {
       "0.3": {
         "n_pos_hours": 55,
-        "POD": 0.491,
-        "FAR": 0.491,
-        "CSI": 0.333,
-        "TP": 27,
-        "FP": 26,
-        "FN": 28
+        "POD": 0.509,
+        "FAR": 0.541,
+        "CSI": 0.318,
+        "TP": 28,
+        "FP": 33,
+        "FN": 27
       },
       "0.5": {
         "n_pos_hours": 55,
-        "POD": 0.455,
-        "FAR": 0.444,
-        "CSI": 0.333,
-        "TP": 25,
-        "FP": 20,
-        "FN": 30
+        "POD": 0.509,
+        "FAR": 0.451,
+        "CSI": 0.359,
+        "TP": 28,
+        "FP": 23,
+        "FN": 27
       },
       "0.7": {
         "n_pos_hours": 55,
-        "POD": 0.418,
-        "FAR": 0.303,
-        "CSI": 0.354,
-        "TP": 23,
-        "FP": 10,
-        "FN": 32
+        "POD": 0.436,
+        "FAR": 0.333,
+        "CSI": 0.358,
+        "TP": 24,
+        "FP": 12,
+        "FN": 31
       }
     },
     "extra_cut0.5": {
       "n_pos_hours": 1777,
-      "POD": 0.755,
-      "FAR": 0.249,
-      "CSI": 0.604,
-      "TP": 1341,
-      "FP": 445,
-      "FN": 436
+      "POD": 0.776,
+      "FAR": 0.255,
+      "CSI": 0.613,
+      "TP": 1379,
+      "FP": 471,
+      "FN": 398
     }
   },
   "storm100_6h": {
@@ -278,10 +278,10 @@
       "0.3": {
         "n_pos_hours": 0,
         "POD": null,
-        "FAR": null,
-        "CSI": null,
+        "FAR": 1.0,
+        "CSI": 0.0,
         "TP": 0,
-        "FP": 0,
+        "FP": 1,
         "FN": 0
       },
       "0.5": {
@@ -305,12 +305,12 @@
     },
     "extra_cut0.5": {
       "n_pos_hours": 291,
-      "POD": 0.285,
-      "FAR": 0.629,
-      "CSI": 0.192,
-      "TP": 83,
-      "FP": 141,
-      "FN": 208
+      "POD": 0.454,
+      "FAR": 0.433,
+      "CSI": 0.337,
+      "TP": 132,
+      "FP": 101,
+      "FN": 159
     }
   }
-}
+    }
