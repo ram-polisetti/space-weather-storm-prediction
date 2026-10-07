@@ -64,3 +64,5 @@ Use the normal download/build/train/evaluate commands in README. If a foreground
 ## Plot delivery caveat for this branch
 
 The four fresh PNGs are in the separately delivered checked review archive. Binary web uploads are blocked at commit, so this text-only review branch leaves old repository PNGs in place. Those old PNGs are NOT the fresh outputs described above. Do not cite them as evidence for this rerun.
+
+Byte-provenance note: source/output hashes in fresh-rerun-provenance.json identify the checked local rerun artifacts. GitHub's editor reformatted only terminal whitespace in metrics.json and eval_summary.json; both parse identically to the originals. Their repository byte hashes therefore differ. Use the separately delivered archive for exact original output bytes and plot hashes.
