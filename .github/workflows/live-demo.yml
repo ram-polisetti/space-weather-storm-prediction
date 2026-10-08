@@ -1,0 +1,37 @@
+name: research dashboard
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 0,6,12,18 * * *'
+  push:
+    branches: [main]
+    paths: ['web/**', 'live/**', 'tests/test_live_site.py', '.github/workflows/live-demo.yml']
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: research-dashboard-pages
+  cancel-in-progress: false
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -p test_live_site.py -v
+      - name: Fetch checked observations
+        run: python live/ingest.py --output web/observations.json
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - name: Publish complete snapshot
+        id: deploy
+        uses: actions/deploy-pages@v4
