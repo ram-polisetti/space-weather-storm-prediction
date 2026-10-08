@@ -5,7 +5,7 @@ on:
     - cron: '17 0,6,12,18 * * *'
   push:
     branches: [main]
-    paths: ['web/**', 'live/**', 'tests/test_live_site.py', '.github/workflows/live-demo.yml']
+    paths: ['web/**', 'live/**', 'tests/test_live_site.py', 'tests/test_evidence.py', '.github/workflows/live-demo.yml']
 permissions:
   contents: read
   pages: write
@@ -26,6 +26,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m unittest discover -s tests -p test_live_site.py -v
+      - run: python -m unittest discover -s tests -p test_evidence.py -v
       - name: Fetch checked observations
         run: python live/ingest.py --output web/observations.json
       - uses: actions/configure-pages@v5
