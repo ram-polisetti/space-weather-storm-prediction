@@ -16,3 +16,11 @@ NOAA feed links:
 - https://www.weather.gov/disclaimer
 
 Deployment proposal: existing public repository; GitHub Pages from Actions; standard runner only; 00:17/06:17/12:17/18:17 UTC plus manual trigger. No domain purchase or paid service. Public deployment requires review of page and configuration first. Commit immutable replay JSON once, not raw datasets/models; no private paper material. A workflow on a review branch does not install the schedule, which runs only on main.
+
+## Data-license boundary
+The MIT license covers our code, not third-party observations. Kyoto's scientific-use policy supports attributed research figures, but its older page restricts redistribution in general. No raw hourly Dst JSON, model binary or source dataset is published in this site. Historical replay is an attributed rendered research figure, with summary minima and provenance only. No commercial application or real-time quicklook Dst is used. Dst provider: WDC for Geomagnetism, Kyoto; DOI 10.17593/14515-74000.
+- https://wdc.kugi.kyoto-u.ac.jp/wdc/Sec3.html
+- https://wdc.kugi.kyoto-u.ac.jp/wdc/expdata.html
+- https://wdc.kugi.kyoto-u.ac.jp/wdc/cresample.html
+
+This boundary is independent of any COMPAS or other dataset notes in the repository; no private paper or COMPAS data are included in this site.
